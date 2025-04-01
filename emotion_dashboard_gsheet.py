@@ -1,11 +1,11 @@
 
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
 import gspread
 from google.oauth2.service_account import Credentials
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# 구글 시트 인증 정보
+# 구글 서비스 계정 인증 정보
 scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 
 # Streamlit secrets에서 키 불러오기
@@ -16,16 +16,18 @@ credentials = Credentials.from_service_account_info(creds_dict, scopes=scope)
 gc = gspread.authorize(credentials)
 
 # 구글 시트에서 데이터 불러오기
-spreadsheet = gc.open("감정 수치 시트")
-worksheet = spreadsheet.worksheet("시트1")
+spreadsheet = gc.open("감정 수치 시트")  # 여기에 정확한 시트 이름을 넣으세요.
+worksheet = spreadsheet.sheet1  # 또는 시트 이름으로 가져올 수 있습니다.
 data = worksheet.get_all_records()
-df = pd.DataFrame(data)
 
-# 플레이어 선택
+# 데이터 확인
+df = pd.DataFrame(data)
+st.write(df)  # 데이터 확인용
+
+# 선택된 플레이어 기준 데이터 필터링 및 시각화
 players = df["From"].unique()
 selected_player = st.selectbox("플레이어 선택", players)
 
-# 선택된 플레이어 기준 데이터 필터링
 filtered_df = df[df["From"] == selected_player].sort_values("감정 수치")
 bar_colors = ['blue' if val < 0 else 'red' for val in filtered_df["감정 수치"]]
 
