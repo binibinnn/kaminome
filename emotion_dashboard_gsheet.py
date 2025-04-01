@@ -19,32 +19,30 @@ else:
 plt.rcParams['axes.unicode_minus'] = False
 plt.rcParams['font.size'] = 10
 
-# credentials from st.secrets
+# 🔐 구글 인증 (Secrets 기반)
 creds_dict = st.secrets["gcp_service_account"]
 credentials = Credentials.from_service_account_info(creds_dict)
 gc = gspread.authorize(credentials)
 
-# open spreadsheet
+# 📊 시트 열기
 spreadsheet = gc.open_by_key("1KhDx1GdC9y1pPXWFSQG2r9Hnn2_wziymZsfznsQQsd0")
 worksheet = spreadsheet.sheet1
 data = worksheet.get_all_records()
 df = pd.DataFrame(data)
 
-# 컬럼 이름
+# 열 이름 설정
 from_col = "닉네임"
 to_col = "메시지"
 score_col = "감정 분석 결과"
 
-# 감정 수치 변환
 df[score_col] = pd.to_numeric(df[score_col], errors="coerce")
 
-# 사용자 로그인
+# 사용자 선택 및 인증
 players = sorted(df[from_col].dropna().unique())
 players.insert(0, "admin")
 input_player = st.selectbox("당신의 이름을 선택하세요", players)
 secret_input = st.text_input(f"{input_player}의 확인 키를 입력하세요", type="password")
 
-# 키 매핑
 secret_keys = {
     "레드": "red123",
     "블루": "blue123",
@@ -53,7 +51,6 @@ secret_keys = {
     "admin": "admin123"
 }
 
-# 인증
 if input_player not in secret_keys:
     st.error("⚠️ 알 수 없는 사용자입니다.")
     st.stop()
@@ -62,7 +59,7 @@ if secret_input != secret_keys[input_player]:
     st.warning("🔒 인증 키가 일치하지 않습니다.")
     st.stop()
 
-# 필터링
+# 감정 필터링
 if input_player == "admin":
     filtered_df = df.dropna(subset=[score_col])
     labels = [f"{f}→{t}" for f, t in zip(filtered_df[from_col], filtered_df[to_col])]
@@ -70,10 +67,10 @@ else:
     filtered_df = df[df[from_col] == input_player].dropna(subset=[score_col])
     labels = filtered_df[to_col].tolist()
 
-# 시각화
 filtered_df = filtered_df.sort_values(score_col)
 bar_colors = ['blue' if val < 0 else 'red' for val in filtered_df[score_col]]
 
+# 시각화
 fig, ax = plt.subplots(figsize=(10, 5))
 x = range(len(filtered_df))
 ax.bar(x, filtered_df[score_col], color=bar_colors, width=0.35)
