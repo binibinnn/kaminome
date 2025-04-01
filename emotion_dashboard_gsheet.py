@@ -7,7 +7,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # 구글 시트 인증
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-credentials = ServiceAccountCredentials.from_json_keyfile_name("your_credentials.json", scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name("google_service_key.json", scope)
 gc = gspread.authorize(credentials)
 
 # 구글 시트에서 데이터 불러오기
