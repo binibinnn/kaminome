@@ -5,12 +5,14 @@ from google.oauth2.service_account import Credentials
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# 구글 서비스 계정 인증 정보
+# 구글 서비스 계정 JSON 파일 경로
+json_file_path = 'google_service_key.json'
+
+# 인증 범위
 scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 
-# Streamlit secrets에서 키 불러오기
-creds_dict = st.secrets["gcp_service_account"]
-credentials = Credentials.from_service_account_info(creds_dict, scopes=scope)
+# Google 인증
+credentials = Credentials.from_service_account_file(json_file_path, scopes=scope)
 
 # gspread 인증
 gc = gspread.authorize(credentials)
