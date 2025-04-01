@@ -17,14 +17,14 @@ credentials = Credentials.from_service_account_file(json_file_path, scopes=scope
 # gspread 인증
 gc = gspread.authorize(credentials)
 
-# 구글 시트에서 데이터 불러오기
-spreadsheet = gc.open("감정 수치 시트")  # 여기에 정확한 시트 이름을 넣으세요.
-worksheet = spreadsheet.sheet1  # 또는 시트 이름으로 가져올 수 있습니다.
+# 구글 시트를 시트 ID로 열기
+spreadsheet = gc.open_by_key("1KhDx1GdC9y1pPXWFSQG2r9Hnn2_wziymZsfznsQQsd0")
+worksheet = spreadsheet.sheet1
 data = worksheet.get_all_records()
 
-# 데이터 확인
+# 데이터프레임으로 변환
 df = pd.DataFrame(data)
-st.write(df)  # 데이터 확인용
+st.write(df)
 
 # 선택된 플레이어 기준 데이터 필터링 및 시각화
 players = df["From"].unique()
